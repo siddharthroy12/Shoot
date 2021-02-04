@@ -1,6 +1,9 @@
 #include "raylib.h"
 #include "Globals.hpp"
 #include "Player.hpp"
+#include "Enemy.hpp"
+#include <vector>
+#include <iostream>
 #include <cmath>
 
 int main(void)
@@ -8,9 +11,14 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
 
+    SetTraceLogLevel(LOG_NONE);
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Shoot!");
 
     Player* player = new Player();
+    std::vector<Enemy*> enemies;
+    enemies.push_back(new Enemy());
+
     float tmp;
     bool showDebug = false;
 
@@ -24,6 +32,9 @@ int main(void)
         //----------------------------------------------------------------------------------
         if (IsKeyPressed(KEY_G)) {
             showDebug = !showDebug;
+        }
+        if (IsKeyPressed(KEY_K)) {
+            enemies.push_back(new Enemy());
         }
         if (IsKeyDown(KEY_W)) {
             player->moveUp();
@@ -53,6 +64,13 @@ int main(void)
         if (player->getPosition().y < ((player->hitbox.height/2))) {
             player->setPosition({ player->getPosition().x, ((player->hitbox.height/2)) });
         }
+
+        for (Enemy* e : enemies) {
+            if (CheckCollisionRecs(player->hitbox, e->hitbox)) {
+                //std::cout << "Collide" << std::endl;
+            }
+        }
+        
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -60,7 +78,11 @@ int main(void)
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
-            
+
+            for (Enemy* e : enemies) {
+                e->render(player->getPosition());
+            }
+
             player->render();
             
             tmp = atan2(GetMousePosition().y - player->getPosition().y, GetMousePosition().x - player->getPosition().x);
@@ -68,6 +90,9 @@ int main(void)
             
             if (showDebug) {
                 DrawRectangleLinesEx(player->hitbox, 2, RED);
+                for (Enemy* e : enemies) {
+                    DrawRectangleLinesEx(e->hitbox, 2, RED);
+                }
             }
 
         EndDrawing();
@@ -76,6 +101,9 @@ int main(void)
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
+    for (Enemy* e : enemies) {
+        delete e;
+    }
     delete player;
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

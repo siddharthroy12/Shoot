@@ -351,6 +351,7 @@ endif
 PROJECT_SOURCE_FILES ?= \
     src/main.cpp \
     src/Player.cpp \
+    src/Enemy.cpp \
 
 # Define all object files from source files
 OBJS = $(patsubst %.c, %.o, $(PROJECT_SOURCE_FILES))
