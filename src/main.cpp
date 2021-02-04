@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "Globals.hpp"
 #include "Player.hpp"
+#include <cmath>
 
 int main(void)
 {
@@ -10,7 +11,8 @@ int main(void)
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Shoot!");
 
     Player* player = new Player();
-    Vector2 tmp;
+    float tmp;
+    bool showDebug = false;
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //---------------------------------------------------------------------------------------
@@ -20,6 +22,9 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
+        if (IsKeyPressed(KEY_G)) {
+            showDebug = !showDebug;
+        }
         if (IsKeyDown(KEY_W)) {
             player->moveUp();
         }
@@ -55,9 +60,15 @@ int main(void)
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
+            
             player->render();
-            player->rotation++;
-            DrawRectangleLinesEx(player->hitbox, 2, RED);
+            
+            tmp = atan2(GetMousePosition().y - player->getPosition().y, GetMousePosition().x - player->getPosition().x);
+            player->rotation = (tmp * 180 / PI) + 90;
+            
+            if (showDebug) {
+                DrawRectangleLinesEx(player->hitbox, 2, RED);
+            }
 
         EndDrawing();
         //----------------------------------------------------------------------------------
