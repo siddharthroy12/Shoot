@@ -1,7 +1,6 @@
 #include "Globals.hpp"
 #include "Enemy.hpp"
 #include <cmath>
-#include <iostream>
 
 Enemy::Enemy() {
     this->texture = LoadTexture("assets/enemy.png");
@@ -9,7 +8,6 @@ Enemy::Enemy() {
     this->destRec = { this->position.x, this->position.y, texture.width*5, texture.height*5};
     this->origin = { (texture.width*5) /2, (texture.height*5)/2 };
     this->hitbox = { this->position.x - ((texture.width*3) / 2), this->position.y - ((texture.height*3) /2), texture.width*3, texture.height*3};
-    std::cout << speed << std::endl;
 }
 
 void Enemy::render(Vector2 playerPosition) {
