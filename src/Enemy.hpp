@@ -9,7 +9,7 @@ class Enemy {
     Rectangle sourceRec;
     Rectangle destRec;
     Vector2 origin;
-    Vector2 position = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
+    Vector2 position = { 0.0f, 0.0f };
     int speed = 2;
     int rotation = 0;
     Vector2 head = { 1.0f, 1.0f };

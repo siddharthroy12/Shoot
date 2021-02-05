@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <string>
 
 int main(void)
 {
@@ -23,12 +24,14 @@ int main(void)
 
     float tmp;
     bool showDebug = false;
+    bool gameOver = false;
+    int kills = 0;
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //---------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while ((!WindowShouldClose()) && (!gameOver))    // Detect window close button or ESC key
     {
         // Update
         //----------------------------------------------------------------------------------
@@ -76,7 +79,7 @@ int main(void)
         for (Enemy* e : enemies) {
             if (e != NULL) {
                 if (CheckCollisionRecs(player->hitbox, e->hitbox)) {
-                //std::cout << "Collide" << std::endl;
+                    gameOver = true;
                 }
             }
         }
@@ -92,13 +95,18 @@ int main(void)
                                     e = NULL;
                                     delete b;
                                     b = NULL;
+                                    kills++;
                                 }
                             }
                             
                         }
                     }
-                }
+               }
             }
+        }
+
+        if (GetRandomValue(0, 30) == 0) {
+            enemies.push_back(new Enemy());
         }
         
         //----------------------------------------------------------------------------------
@@ -135,8 +143,11 @@ int main(void)
                         DrawRectangleLinesEx(e->hitbox, 2, RED);
                     }
                 }
+
             }
 
+            DrawText(std::to_string((int)GetTime()).c_str(), 6,5, 25, GREEN);
+            DrawText(std::to_string(kills).c_str(), 6,28, 25, RED);
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
