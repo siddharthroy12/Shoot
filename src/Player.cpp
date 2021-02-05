@@ -1,5 +1,6 @@
 #include "Globals.hpp"
 #include "Player.hpp"
+#include <cmath>
 
 Player::Player() {
     this->texture = LoadTexture("assets/player.png");
@@ -10,6 +11,10 @@ Player::Player() {
 }
 
 void Player::render() {
+    float tmp = atan2(GetMousePosition().y -position.y, GetMousePosition().x - position.x);
+    rotation = (tmp * 180 / PI) + 90;
+    this->head.x = cos(tmp);
+    this->head.y = sin(tmp);
     DrawTexturePro(texture, sourceRec, destRec, origin, rotation, WHITE);
 }
 

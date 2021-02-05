@@ -2,6 +2,7 @@
 #include "Globals.hpp"
 #include "Player.hpp"
 #include "Enemy.hpp"
+#include "Bullet.hpp"
 #include <vector>
 #include <iostream>
 #include <cmath>
@@ -11,12 +12,13 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
 
-    SetTraceLogLevel(LOG_NONE);
+    SetTraceLogLevel(LOG_TRACE);
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Shoot!");
 
     Player* player = new Player();
     std::vector<Enemy*> enemies;
+    std::vector<Bullet*> bullets;
     enemies.push_back(new Enemy());
 
     float tmp;
@@ -35,6 +37,12 @@ int main(void)
         }
         if (IsKeyPressed(KEY_K)) {
             enemies.push_back(new Enemy());
+        }
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            bullets.push_back(new Bullet(player->getPosition(), player->head));
+        }
+        if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+            bullets.push_back(new Bullet(player->getPosition(), player->head));
         }
         if (IsKeyDown(KEY_W)) {
             player->moveUp();
@@ -66,8 +74,30 @@ int main(void)
         }
 
         for (Enemy* e : enemies) {
-            if (CheckCollisionRecs(player->hitbox, e->hitbox)) {
+            if (e != NULL) {
+                if (CheckCollisionRecs(player->hitbox, e->hitbox)) {
                 //std::cout << "Collide" << std::endl;
+                }
+            }
+        }
+
+        if (bullets.size() > 0) {
+            for (Bullet*& b : bullets) {
+                if (b != NULL) {
+                    for (Enemy*& e : enemies) {
+                        if (e != NULL) {
+                            if (b != NULL ) {
+                                if (CheckCollisionRecs(b->hitbox, e->hitbox)) {
+                                    delete e;
+                                    e = NULL;
+                                    delete b;
+                                    b = NULL;
+                                }
+                            }
+                            
+                        }
+                    }
+                }
             }
         }
         
@@ -80,7 +110,17 @@ int main(void)
             ClearBackground(RAYWHITE);
 
             for (Enemy* e : enemies) {
-                e->render(player->getPosition());
+                if (e != NULL) {
+                    e->render(player->getPosition());
+                }   
+            }
+
+            if (bullets.size() > 0) {
+                for (Bullet* b : bullets) {
+                    if (b != NULL) {
+                        b->render();
+                    }
+                }
             }
 
             player->render();
@@ -91,7 +131,9 @@ int main(void)
             if (showDebug) {
                 DrawRectangleLinesEx(player->hitbox, 2, RED);
                 for (Enemy* e : enemies) {
-                    DrawRectangleLinesEx(e->hitbox, 2, RED);
+                    if (e != NULL) {
+                        DrawRectangleLinesEx(e->hitbox, 2, RED);
+                    }
                 }
             }
 
@@ -102,7 +144,14 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     for (Enemy* e : enemies) {
-        delete e;
+        if (e != NULL) {
+            delete e;
+        }
+    }
+    for (Bullet* b : bullets) {
+        if (b != NULL) {
+            delete b;
+        }
     }
     delete player;
     CloseWindow();        // Close window and OpenGL context

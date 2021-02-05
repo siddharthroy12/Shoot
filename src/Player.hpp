@@ -13,6 +13,7 @@ class Player {
     int speed = 5;
     
     public:
+        Vector2 head = { 1.0f, 1.0f };
         Player();
         ~Player();
         Rectangle hitbox;
