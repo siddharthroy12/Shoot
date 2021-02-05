@@ -13,7 +13,7 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
 
-    SetTraceLogLevel(LOG_TRACE);
+    SetTraceLogLevel(LOG_NONE);
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Shoot!");
 
