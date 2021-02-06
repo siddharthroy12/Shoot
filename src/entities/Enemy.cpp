@@ -1,9 +1,9 @@
-#include "Globals.hpp"
+#include "../Globals.hpp"
 #include "Enemy.hpp"
 #include <cmath>
-#include <iostream>
+#include "Player.hpp"
 
-Enemy::Enemy() {
+Enemy::Enemy(Node* parent) : Node(parent) {
     if (GetRandomValue(0, 1)) {
         position.x = 0.0f;
     } else {
@@ -21,21 +21,26 @@ Enemy::Enemy() {
     this->hitbox = { this->position.x - ((texture.width*3) / 2), this->position.y - ((texture.height*3) /2), texture.width*3, texture.height*3};
 }
 
-void Enemy::render(Vector2 playerPosition) {
+void Enemy::render() {
+    DrawTexturePro(texture, sourceRec, destRec, origin, rotation, WHITE);
+}
+
+void Enemy::update() {
+    Player* tmpp = (Player*) parent->getChildren("Player");
+    Vector2 playerPosition = tmpp->getPosition();
     float tmp = atan2(playerPosition.y -position.y, playerPosition.x - position.x);
     rotation = (tmp * 180 / PI) + 90;
     this->head.x = cos(tmp);
     this->head.y = sin(tmp);
     this->setPosition({ this->getPosition().x + (head.x * speed), this->getPosition().y + (head.y * speed) });
-    DrawTexturePro(texture, sourceRec, destRec, origin, rotation, WHITE);
 }
 
 Vector2 Enemy::getPosition() { return this-> position; }
 
 void Enemy::setPosition(Vector2 position) {
     this->position = position;
-    this->destRec = { this->position.x, this->position.y, texture.width*5, texture.height*5};
-    this->hitbox = { this->position.x - ((texture.width*3) / 2), this->position.y - ((texture.height*3) /2), texture.width*3, texture.height*3};
+    this->destRec = { this->position.x, this->position.y, texture.width*5, texture.height*5 };
+    this->hitbox = { this->position.x - ((texture.width*3) / 2), this->position.y - ((texture.height*3) /2), texture.width*3, texture.height*3 };
 }
 
 Enemy::~Enemy() {

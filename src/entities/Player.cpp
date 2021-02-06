@@ -1,8 +1,8 @@
-#include "Globals.hpp"
+#include "../Globals.hpp"
 #include "Player.hpp"
 #include <cmath>
 
-Player::Player() {
+Player::Player(Node* parent) : Node(parent) {
     this->texture = LoadTexture("assets/player.png");
     this->sourceRec = { 0.0f, 0.0f, texture.width, texture.height };
     this->destRec = { this->position.x, this->position.y, texture.width*5, texture.height*5};
@@ -11,11 +11,43 @@ Player::Player() {
 }
 
 void Player::render() {
+    DrawTexturePro(texture, sourceRec, destRec, origin, rotation, WHITE);
+}
+
+void Player::update() {
     float tmp = atan2(GetMousePosition().y -position.y, GetMousePosition().x - position.x);
     rotation = (tmp * 180 / PI) + 90;
     this->head.x = cos(tmp);
     this->head.y = sin(tmp);
-    DrawTexturePro(texture, sourceRec, destRec, origin, rotation, WHITE);
+
+    if (IsKeyDown(KEY_W)) {
+        this->moveUp();
+    }
+    if (IsKeyDown(KEY_S)) {
+        this->moveDown();
+    }
+    if (IsKeyDown(KEY_D)) {
+        this->moveRight();
+    }
+    if (IsKeyDown(KEY_A)) {
+        this->moveLeft();
+    }
+
+    if (this->getPosition().x < ((this->hitbox.width/2))) {
+        this->setPosition({ ((this->hitbox.width/2)), this->getPosition().y });
+    }
+        
+    if (this->getPosition().x > (SCREEN_WIDTH - (this->hitbox.width/2))) {
+        this->setPosition({ (SCREEN_WIDTH - (this->hitbox.width/2)), this->getPosition().y });
+    }
+
+    if (this->getPosition().y > (SCREEN_HEIGHT - (this->hitbox.height/2))) {
+        this->setPosition({ this->getPosition().x, (SCREEN_HEIGHT - (this->hitbox.height/2)) });
+    }
+
+    if (this->getPosition().y < ((this->hitbox.height/2))) {
+        this->setPosition({ this->getPosition().x, ((this->hitbox.height/2)) });
+    }
 }
 
 Vector2 Player::getPosition() { return this-> position; }

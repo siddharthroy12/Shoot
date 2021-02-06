@@ -1,12 +1,7 @@
 #include "raylib.h"
 #include "Globals.hpp"
-#include "Player.hpp"
-#include "Enemy.hpp"
-#include "Bullet.hpp"
-#include <vector>
-#include <iostream>
-#include <cmath>
-#include <string>
+#include "./context/GlobalContext.hpp"
+#include "Node.hpp"
 
 int main(void)
 {
@@ -14,157 +9,26 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     SetTraceLogLevel(LOG_NONE);
-
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Shoot!");
-
-    Player* player = new Player();
-    std::vector<Enemy*> enemies;
-    std::vector<Bullet*> bullets;
-    enemies.push_back(new Enemy());
-
-    float tmp;
-    bool showDebug = false;
-    bool gameOver = false;
-    int kills = 0;
-
+    SetExitKey(0);
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    initGlobalState();
     //---------------------------------------------------------------------------------------
 
+
+
     // Main game loop
-    while ((!WindowShouldClose()) && (!gameOver))    // Detect window close button or ESC key
+    while ((!WindowShouldClose()) && globalState != NULL)    // Detect window close button or ESC key
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        if (IsKeyPressed(KEY_G)) {
-            showDebug = !showDebug;
-        }
-        if (IsKeyPressed(KEY_K)) {
-            enemies.push_back(new Enemy());
-        }
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            bullets.push_back(new Bullet(player->getPosition(), player->head));
-        }
-        if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
-            bullets.push_back(new Bullet(player->getPosition(), player->head));
-        }
-        if (IsKeyDown(KEY_W)) {
-            player->moveUp();
-        }
-        if (IsKeyDown(KEY_S)) {
-            player->moveDown();
-        }
-        if (IsKeyDown(KEY_D)) {
-            player->moveRight();
-        }
-        if (IsKeyDown(KEY_A)) {
-            player->moveLeft();
-        }
-
-        if (player->getPosition().x < ((player->hitbox.width/2))) {
-            player->setPosition({ ((player->hitbox.width/2)), player->getPosition().y });
-        }
-        
-        if (player->getPosition().x > (SCREEN_WIDTH - (player->hitbox.width/2))) {
-            player->setPosition({ (SCREEN_WIDTH - (player->hitbox.width/2)), player->getPosition().y });
-        }
-
-        if (player->getPosition().y > (SCREEN_HEIGHT - (player->hitbox.height/2))) {
-            player->setPosition({ player->getPosition().x, (SCREEN_HEIGHT - (player->hitbox.height/2)) });
-        }
-
-        if (player->getPosition().y < ((player->hitbox.height/2))) {
-            player->setPosition({ player->getPosition().x, ((player->hitbox.height/2)) });
-        }
-
-        for (Enemy* e : enemies) {
-            if (e != NULL) {
-                if (CheckCollisionRecs(player->hitbox, e->hitbox)) {
-                    gameOver = true;
-                }
-            }
-        }
-
-        if (bullets.size() > 0) {
-            for (Bullet*& b : bullets) {
-                if (b != NULL) {
-                    for (Enemy*& e : enemies) {
-                        if (e != NULL) {
-                            if (b != NULL ) {
-                                if (CheckCollisionRecs(b->hitbox, e->hitbox)) {
-                                    delete e;
-                                    e = NULL;
-                                    delete b;
-                                    b = NULL;
-                                    kills++;
-                                }
-                            }
-                            
-                        }
-                    }
-               }
-            }
-        }
-
-        if (GetRandomValue(0, 30) == 0) {
-            enemies.push_back(new Enemy());
-        }
-        
-        //----------------------------------------------------------------------------------
-
-        // Draw
-        //----------------------------------------------------------------------------------
         BeginDrawing();
-
-            ClearBackground(RAYWHITE);
-
-            for (Enemy* e : enemies) {
-                if (e != NULL) {
-                    e->render(player->getPosition());
-                }   
-            }
-
-            if (bullets.size() > 0) {
-                for (Bullet* b : bullets) {
-                    if (b != NULL) {
-                        b->render();
-                    }
-                }
-            }
-
-            player->render();
-            
-            tmp = atan2(GetMousePosition().y - player->getPosition().y, GetMousePosition().x - player->getPosition().x);
-            player->rotation = (tmp * 180 / PI) + 90;
-            
-            if (showDebug) {
-                DrawRectangleLinesEx(player->hitbox, 2, RED);
-                for (Enemy* e : enemies) {
-                    if (e != NULL) {
-                        DrawRectangleLinesEx(e->hitbox, 2, RED);
-                    }
-                }
-
-            }
-
-            DrawText(std::to_string((int)GetTime()).c_str(), 6,5, 25, GREEN);
-            DrawText(std::to_string(kills).c_str(), 6,28, 25, RED);
+            globalState->rootNode->updateAndRender();
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    for (Enemy* e : enemies) {
-        if (e != NULL) {
-            delete e;
-        }
-    }
-    for (Bullet* b : bullets) {
-        if (b != NULL) {
-            delete b;
-        }
-    }
-    delete player;
+    cleanGlobalState();
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 

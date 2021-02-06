@@ -2,9 +2,11 @@
 #define ENEMY_HPP
 
 #include "raylib.h"
-#include "Globals.hpp"
+#include "../Globals.hpp"
+#include "../Node.hpp"
+#include <string>
 
-class Enemy {
+class Enemy : public Node {
     Texture texture;
     Rectangle sourceRec;
     Rectangle destRec;
@@ -15,10 +17,12 @@ class Enemy {
     Vector2 head = { 1.0f, 1.0f };
 
     public:
-        Enemy();
+        Enemy(Node* parent);
+        char* name() { return "Enemy"; }
         ~Enemy();
         Rectangle hitbox;
-        void render(Vector2 playerPosition);
+        void render();
+        void update();
         Vector2 getPosition();
         void setPosition(Vector2 position);
 };

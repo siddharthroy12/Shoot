@@ -2,16 +2,20 @@
 #define BULLET_HPP
 
 #include "raylib.h"
+#include "../Node.hpp"
+#include <string>
 
-class Bullet {
+class Bullet : public Node {
     int size = 10;
     int speed = 20;
     Vector2 direction = { 0.0f, 0.0f };
 
     public:
+        char* name() { return "Bullet"; }
         Rectangle hitbox = { 0.0f, 0.0f, size, size };
         void render();
-        Bullet(Vector2 pos, Vector2 dir);
+        void update();
+        Bullet(Node* parent);
         ~Bullet();
 };
 
